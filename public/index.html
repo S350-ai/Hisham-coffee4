@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="/logo.png"><title>Hisham Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6efe6;--sf:#fffaf3;--tx:#2b1b12;--mt:#7a6454;--ac:#6f4528;--ac2:#c58b4e;--bd:#e4d5c3;--ok:#2f7d4f;--bad:#b3392f;--nt:#fff0c2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1c130d;--sf:#2a1d14;--tx:#f3e8da;--mt:#b9a48f;--ac:#d9a066;--ac2:#a56a35;--bd:#42301f;--nt:#5a4614}}
+:root[data-theme=dark]{--bg:#1c130d;--sf:#2a1d14;--tx:#f3e8da;--mt:#b9a48f;--ac:#d9a066;--ac2:#a56a35;--bd:#42301f;--nt:#5a4614}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Cairo,system-ui,sans-serif;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;padding:10px 14px;flex-wrap:wrap}
+header h1{font-size:1.3rem;margin:0;flex:1;color:var(--ac)}
+.btn{background:var(--ac);color:var(--bg);border:0;border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600}
+.btn.s{background:transparent;color:var(--ac);border:1px solid var(--ac)}.btn.bad{background:var(--bad);color:#fff}.btn.ok{background:var(--ok);color:#fff}
+.btn.on{background:var(--ac);color:var(--bg)}
+main{max-width:1000px;margin:0 auto;padding:14px}
+.hero{text-align:center;padding:26px 10px;animation:f .6s}.hero img{mix-blend-mode:multiply}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .hero img{mix-blend-mode:normal}}:root[data-theme=dark] .hero img{mix-blend-mode:normal}.hero h2{font-size:2rem;margin:0;color:var(--ac)}.hero p{color:var(--mt);margin:4px 0}
+.ann{background:var(--nt);border-radius:10px;padding:8px 12px;margin:8px 0;text-align:center}
+@keyframes f{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 0}.tabs .btn{white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;animation:f .4s}
+.card img{width:100%;height:130px;object-fit:cover;border-radius:10px}
+.card h3{margin:0;font-size:1rem}.pr{color:var(--ac);font-weight:800}.mt{color:var(--mt);font-size:.85rem}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.drawer{position:fixed;inset:0;background:#0007;z-index:20;display:none}.drawer.o{display:block}
+.pan{position:absolute;top:0;bottom:0;inset-inline-end:0;width:min(420px,100%);background:var(--sf);padding:16px;overflow:auto;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;margin:3px 0 8px}
+label{font-size:.85rem;color:var(--mt)}
+table{width:100%;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid var(--bd);text-align:start;vertical-align:top}
+.wrap{overflow-x:auto}.note{background:var(--nt);border-inline-start:4px solid var(--ac2);padding:6px 10px;border-radius:6px;font-weight:600}
+.badge{padding:2px 8px;border-radius:99px;background:var(--bd);font-size:.8rem}.new{background:var(--ac2);color:#fff}
+.toast{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));inset-inline:14px;margin:auto;max-width:420px;background:var(--ok);color:#fff;padding:12px;border-radius:12px;z-index:30;text-align:center;display:none}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}.stat div{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:1.4rem;color:var(--ac)}
+.big{font-size:2.4rem;font-weight:800;color:var(--ac);text-align:center}
+</style></head><body>
+<header><h1 id="ttl">Hisham Coffee</h1>
+<span class="row"><button class="btn s" data-l="en">EN</button><button class="btn s" data-l="ar">ع</button><button class="btn s" data-l="he">עב</button></span>
+<button class="btn s" id="adm" style="display:none"></button><button class="btn s" id="mb"></button><button class="btn" id="cb"></button></header>
+<main id="m"></main>
+<div class="drawer" id="dr"><div class="pan" id="pan"></div></div><div class="toast" id="ts"></div>
+<script>
+const U={
+en:{cart:"Cart",add:"Add",total:"Total",name:"Your name",bld:"Building number / name",room:"Classroom / room number",note:"Additional notes (optional)",send:"Place order (no payment)",empty:"Your cart is empty",thx:"Thank you! Your order was received",num:"Your order number",need:"Please fill in name, building and room",na:"Unavailable",adm:"Admin",shop:"Menu",orders:"Orders",prods:"Products",site:"Website",save:"Save",del:"Delete",s:"Small",l:"Large",sl:"Slice",wh:"Whole",new:"New",preparing:"Preparing",ready:"Ready",delivered:"Delivered",rejected:"Rejected",cancelled:"Cancelled",all:"All",search:"Search order # / name",bldf:"Building",roomf:"Room",date:"Date",addp:"Add product",seed:"Import official menu",img:"Image",avail:"Available",cat:"Category",price:"Price(s) e.g. 9/13",desc:"Description",en:"English",ar:"Arabic",he:"Hebrew",tot:"Total orders",val:"Total value",pop:"Most popular",new1:"New order!",acc:"Accept",close:"Close",contact:"Contact",ann:"Announcement",tag:"Tagline",tt:"Title",login:"Admin access requires the site owner’s claude.ai sign-in.",back:"Back to site"},
+ar:{cart:"السلة",add:"إضافة",total:"المجموع",name:"اسمك",bld:"رقم/اسم المبنى",room:"رقم القاعة / الغرفة",note:"ملاحظات إضافية (اختياري)",send:"إرسال الطلب (بدون دفع)",empty:"السلة فارغة",thx:"شكراً! تم استلام طلبك",num:"رقم طلبك",need:"الرجاء تعبئة الاسم والمبنى والغرفة",na:"غير متوفر",adm:"الإدارة",shop:"القائمة",orders:"الطلبات",prods:"المنتجات",site:"الموقع",save:"حفظ",del:"حذف",s:"صغير",l:"كبير",sl:"شريحة",wh:"كاملة",new:"جديد",preparing:"قيد التحضير",ready:"جاهز",delivered:"تم التسليم",rejected:"مرفوض",cancelled:"ملغى",all:"الكل",search:"بحث برقم الطلب / الاسم",bldf:"المبنى",roomf:"الغرفة",date:"التاريخ",addp:"إضافة منتج",seed:"استيراد القائمة الرسمية",img:"الصورة",avail:"متوفر",cat:"الفئة",price:"السعر/الأسعار مثل 9/13",desc:"الوصف",en:"الإنجليزية",ar:"العربية",he:"العبرية",tot:"إجمالي الطلبات",val:"إجمالي القيمة",pop:"الأكثر طلباً",new1:"طلب جديد!",acc:"قبول",close:"إغلاق",contact:"التواصل",ann:"إعلان",tag:"الشعار النصي",tt:"العنوان",login:"الدخول للإدارة يتطلب تسجيل دخول مالك الموقع في claude.ai.",back:"العودة للموقع"},
+he:{cart:"עגלה",add:"הוסף",total:"סה״כ",name:"השם שלך",bld:"מספר / שם בניין",room:"מספר כיתה / חדר",note:"הערות נוספות (אופציונלי)",send:"שלח הזמנה (ללא תשלום)",empty:"העגלה ריקה",thx:"תודה! ההזמנה התקבלה",num:"מספר ההזמנה שלך",need:"נא למלא שם, בניין וחדר",na:"לא זמין",adm:"ניהול",shop:"תפריט",orders:"הזמנות",prods:"מוצרים",site:"האתר",save:"שמור",del:"מחק",s:"קטן",l:"גדול",sl:"פרוסה",wh:"שלם",new:"חדש",preparing:"בהכנה",ready:"מוכן",delivered:"נמסר",rejected:"נדחה",cancelled:"בוטל",all:"הכל",search:"חיפוש לפי מס׳ הזמנה / שם",bldf:"בניין",roomf:"חדר",date:"תאריך",addp:"הוסף מוצר",seed:"ייבוא התפריט הרשמי",img:"תמונה",avail:"זמין",cat:"קטגוריה",price:"מחיר/ים לדוגמה 9/13",desc:"תיאור",en:"אנגלית",ar:"ערבית",he:"עברית",tot:"סה״כ הזמנות",val:"סה״כ ערך",pop:"הכי פופולרי",new1:"הזמנה חדשה!",acc:"אשר",close:"סגור",contact:"יצירת קשר",ann:"הודעה",tag:"סלוגן",tt:"כותרת",login:"כניסה לניהול דורשת התחברות של בעל האתר ב-claude.ai.",back:"חזרה לאתר"}};
+const CAT={d:["Coffee & Drinks","قهوة ومشروبات","קפה ומשקאות"],sp:["Specials","مميزات","מיוחדים"],p:["Pastries","معجنات","מאפים"],sw:["Sandwiches","السندويشات","כריכים"],bt:["Bite Sandwiches","ساندويش لقمة","סנדוויץ׳ ביס"],pz:["Pizzas & Focaccia","بيتزا وفوكاتشا","פיצות ופוקצ׳ות"],pa:["Pasta","باستا","פסטה"],sa:["Salads","سلطات","סלטים"],so:["Soups","شوربة","מרקים"]};
+const LI={en:0,ar:1,he:2};
+// official menu: cat|he|ar|en|price|labels
+const SEED=`d|הפוך|هافوخ|Hafuch (Latte)|9/13
+d|אמריקנו|أماريكانو|Americano|9/13
+d|קורטדו|كورتادو|Cortado|9
+d|מקיאטו|مكياتو|Macchiato|9
+d|קפה קר|قهوة باردة|Cold Coffee|12/16
+d|אייס קפה|اييس قهوة|Iced Coffee|14/18
+d|גרוס|مجروش|Gros|12/16
+d|פספלורה|باسفلورا|Passiflora|14/18
+d|קפה שחור|قهوة|Black Coffee|6
+d|נס כמו בבית|نسكافيه بيتي|Home-style Nes|7
+d|שוקו קר|شوكو بارد|Cold Chocolate Milk|13
+d|שוקו חם|شوكو ساخن|Hot Chocolate Milk|13
+d|אספרסו קצר|اسبريسو قصير|Short Espresso|7
+d|אספרסו ארוך|اسبريسو طويل|Long Espresso|7
+d|אספרסו כפול|اسبريسو مضاعف|Double Espresso|9
+d|תפוזים טבעי|برتقال طبيعي|Fresh Orange Juice|16
+sp|פרנץ׳ וניל|فرانتش فانيلا|French Vanilla|15
+sp|צ׳אי לאטה|تشاي لاتيه|Chai Latte|15
+sp|שוקו פרלינים|شوكو فرلينيم|Praline Chocolate Milk|15
+p|קרואסון חמאה|كرواسون زبدة|Butter Croissant|5/15
+p|קרואסון שוקולד|كرواسون شوكولاتة|Chocolate Croissant|5/15
+p|קרואסון קינמון|كرواسون قرفة|Cinnamon Croissant|5/15
+p|קרואסון שקדים|كرواسون لوز|Almond Croissant|5/15
+p|בורקס גבינה|بوركس بالجبنة|Cheese Burekas|13
+p|בורקס תפוח אדמה|بوركس بالبطاطا|Potato Burekas|13
+p|חמאה עם סלמון|بالزبدة والسلمون|Butter Bread with Salmon|25
+p|חמאה עם גבינה צהובה|بالزبدة والجبنة الصفراء|Butter Bread with Yellow Cheese|22
+sw|חביתה|عجة|Omelette|23
+sw|סלמון|سلمون|Salmon|30
+sw|טונה|طونة|Tuna|23
+sw|טבעוני|نباتي|Vegan|23
+sw|סביח|سبيح|Sabich|23
+sw|שקשוקה|شكشوكة|Shakshuka|25
+sw|אבוקדו|أفوكادو|Avocado|23
+sw|סלט ביצים|سلطة بيض|Egg Salad|23
+sw|גאודה|جبنة جاودا|Gouda|23
+sw|גבינת עזים|جبنة ماعز|Goat Cheese|28
+sw|עיראקי\\יווני|عراقي\\لبناني|Iraqi / Greek|28
+bt|סביח|سبيح|Sabich Bite|8.5
+bt|גאודה|جبنة جاودا|Gouda Bite|8.5
+bt|אנטיפסטי|خضار مشوية|Antipasti Bite|8.5
+bt|טונה|طونة|Tuna Bite|8.5
+pz|נפוליטנית|نابولية|Neapolitan Pizza|26
+pz|בלקנית|بالكان|Balkan Pizza|26
+pz|תוספת|الاضافة|Extra Topping|3
+pz|טונה וביצים|طونة وبيض|Tuna & Eggs Topping|5
+pz|פוקצ׳ה טבעונית|فوكاتشا نباتية|Vegan Focaccia|13/38|sl,wh
+pa|פנה|بيني|Penne (cream / tomato / rosé)|29
+sa|הרכבה עצמית|اختيار سلطتك|Build Your Own Salad|23/27
+sa|ניסואז|نيسواز|Niçoise Salad|29/39
+sa|יווני|يونانية|Greek Salad|29/39
+sa|קפרזה|كابريزي|Caprese Salad|29/39
+sa|בריאות|صحية|Healthy Salad|29/39
+sa|הבית|البيت|House Salad|29/39
+sa|קיסר|القيصر|Caesar Salad|29/39
+so|מרק היום|شوربة اليوم|Soup of the Day|12`;
+const DESC={"Butter Bread with Salmon":"גבינת שמנת, סלמון, רוקט ובצל ירוק~جبنة كريمية، سلمون، جرجير وبصل أخضر~Cream cheese, salmon, arugula and green onion","Butter Bread with Yellow Cheese":"גבינת שמנת, גבינה צהובה, מלפפון, עגבנייה ועלי בייבי~جبنة كريمية، جبنة صفراء، خيار، بندورة وأوراق نباتية~Cream cheese, yellow cheese, cucumber, tomato and baby leaves","Omelette":"חביתה, מלפפון, חסה, גבינת שמנת ועגבנייה~عجّة بيض، مخلل، خس، جبنة كريمية وبندورة~Omelette, cucumber, lettuce, cream cheese and tomato","Salmon":"גבינת שמנת, סלמון, בצל ירוק ורוקט~جبنة كريمية، سلمون، بصل أخضر وجرجير~Cream cheese, salmon, green onion and arugula","Tuna":"טונה, מיונז, מלפפון וחסה~طونة، ميونيز، مخلل، خسة~Tuna, mayonnaise, cucumber and lettuce","Vegan":"טחינה, חציל, פלפל קלוי, תפוח אדמה ועלי בייבי~طحينة، باذنجان، فلفل مشوي، بطاطا وأوراق البيبي~Tahini, eggplant, roasted pepper, potato and baby leaves","Sabich":"טחינה, תפוח אדמה, חציל, ביצים קשות ופטרוזיליה~طحينة، بطاطا، باذنجان، بيض مقلي وبقدونس~Tahini, potato, eggplant, hard-boiled eggs and parsley","Neapolitan Pizza":"רוטב עגבניות, גבינת מוצרלה ותוספת לבחירה~صلصة بندورة، جبنة موزاريلا وإضافة حسب الاختيار~Tomato sauce, mozzarella and a topping of your choice","Balkan Pizza":"גבינת מוצרלה, גבינה בולגרית, ירקות קלויים ובזיליקום~جبنة موزاريلا، جبنة بلغارية، خضار مشوية وريحان~Mozzarella, Bulgarian cheese, roasted vegetables and basil","Vegan Focaccia":"פסטו וירקות קלויים~بيستو وخضار مقلية~Pesto and roasted vegetables","Penne (cream / tomato / rosé)":"רוטב לבחירה: שמנת, עגבניות, רוזה~الصلصة حسب الاختيار: كريمة، البندورة، روزيه~Choice of sauce: cream, tomato or rosé","Niçoise Salad":"טונה, ביצים, מלפפון, שעועית ירוקה, עגבניות שרי ותפוח אדמה~تونة، بيض مسلوق، خيار، فاصوليا خضراء، بندورة شيري وبطاطا~Tuna, eggs, cucumber, green beans, cherry tomatoes and potato","Greek Salad":"חסה, מלפפון, עגבנייה, גבינה בולגרית וזיתים~خس، خيار، بندورة، جبنة بلغارية وزيتون~Lettuce, cucumber, tomato, Bulgarian cheese and olives","Caprese Salad":"עגבניות שרי, קראנץ׳ אגוזים, בזיליקום וגבינת פטה~بندورة شيري، جوز طازج، ريحان وجبنة فيتا~Cherry tomatoes, crunchy walnuts, basil and feta","Healthy Salad":"קינואה, אגוזים, גבינה וחמוציות~كينوا، مكسرات، جبنة وتوت بري مجفف~Quinoa, nuts, cheese and dried cranberries","House Salad":"מלפפון, עגבנייה, חמוציות, עגבניות שרי ועלי בייבי~خيار، بندورة، كرانبيري، بندورة شيري وأوراق نباتية~Cucumber, tomato, cranberries, cherry tomatoes and baby leaves","Caesar Salad":"עלי חסה, קרוטונים, פרמזן, בצל סגול~خس، خبز محمّص (كروتون)، جبنة بارميزان وبصل بنفسجي~Lettuce, croutons, parmesan and red onion","Soup of the Day":"עדשים, ירקות, תירס ושעועית לבנה, כתום~عدس، خضار، الذرة والفاصوليا البيضاء، البرتقالية~Lentil, vegetable, corn & white bean, or orange soup"};
+const SEEDP=SEED.split("\n").map((l,k)=>{const[c,he,ar,en,pr,lb]=l.split("|");const[dh="",da="",de=""]=(DESC[en]||"").split("~");return{id:"p"+(1000+k),n:{en,ar,he},d:{en:de,ar:da,he:dh},pr:pr.split("/").map(Number),lb:lb||"",c,on:true,img:"",o:k}});
+let seeding=false;async function seedAll(){if(seeding||!db)return;seeding=true;for(const p of SEEDP){const{id,...r}=p;await db.collection("products").doc(id).set(r)}}
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let lang=(()=>{try{return localStorage.getItem("hl")}catch(e){return null}})()||"en";
+let db,user,assets,isAdm=false,P=[],O=[],S={},cart=[],view="shop",cat="all",first=true,last=null,ofil={q:"",st:"all",b:"",r:"",d:""};
+const t=k=>U[lang][k]||k,tr=o=>o&&(o[lang]||o.en||o.he||"");
+const cn=c=>(S.cats&&S.cats[c]&&tr(S.cats[c]))||CAT[c][LI[lang]];
+const pri=(p,i)=>(p.pr||[0])[i??0]; const lab=(p,i)=>p.pr.length>1?t((p.lb||"s,l").split(",")[i]):"";
+const fmt=n=>"₪"+(+n).toFixed(n%1?1:0);
+function toast(m,ms=4500){const e=$("#ts");e.textContent=m;e.style.display="block";setTimeout(()=>e.style.display="none",ms);try{const a=new AudioContext(),o=a.createOscillator();o.connect(a.destination);o.frequency.value=880;o.start();setTimeout(()=>o.stop(),180)}catch(e){}}
+function setLang(l){lang=l;try{localStorage.setItem("hl",l)}catch(e){}document.documentElement.lang=l;document.documentElement.dir=l=="en"?"ltr":"rtl";render()}
+document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+$("#cb").onclick=()=>openCart();
+$("#dr").onclick=e=>{if(e.target.id=="dr")e.target.classList.remove("o")};
+function render(){$("#ttl").textContent=tr(S.title)||"Hisham Coffee";document.title=$("#ttl").textContent;
+if(window.IS_ADMIN_PAGE){if(!isAdm)return loginUI();$("#cb").style.display="none";const a=$("#adm");a.style.display="";a.textContent=LO[lang];a.onclick=async()=>{await api("POST","/api/logout");location.reload()};admin()}
+else{try{localStorage.setItem("hc",JSON.stringify(cart))}catch(e){}$("#cb").textContent="🛒 "+t("cart")+" ("+cart.reduce((x,c)=>x+c.q,0)+")";$("#adm").style.display="none";$("#mb").style.display="";$("#mb").textContent="📋 "+t("myo")+" ("+MY.length+")";shop()}}
+function shop(){const cs=Object.keys(CAT).filter(c=>IT().some(p=>p.c==c));
+let h=`<div class="hero"><img src="${esc(S.logo||"/logo.png")}" alt="Hisham Coffee" style="max-width:min(280px,80%);border-radius:20px"><h2 style="position:absolute;left:-9999px">${esc(tr(S.title)||"Hisham Coffee")}</h2>${tr(S.tag)?`<p>${esc(tr(S.tag))}</p>`:""}${S.contact?`<p class="mt">${esc(S.contact)}</p>`:""}</div>`;
+if(tr(S.ann))h+=`<div class="ann">📢 ${esc(tr(S.ann))}</div>`;
+h+=`<div class="tabs"><button class="btn ${cat=="all"?"on":"s"}" data-c="all">${t("all")}</button>${cs.map(c=>`<button class="btn ${cat==c?"on":"s"}" data-c="${c}">${esc(cn(c))}</button>`).join("")}</div><div class="grid">`;
+IT().filter(p=>cat=="all"||p.c==cat).forEach(p=>{h+=`<div class="card">${p.img?`<img src="${esc(p.img)}" alt="">`:""}<h3>${esc(tr(p.n))}</h3>${tr(p.d)?`<div class="mt">${esc(tr(p.d))}</div>`:""}`;
+if(!p.on)h+=`<div class="mt">${t("na")}</div>`;else p.pr.forEach((x,i)=>{h+=`<div class="row"><span class="pr">${fmt(x)}</span><span class="mt" style="flex:1">${lab(p,i)}</span><button class="btn" data-a="${p.id}|${i}">+ ${t("add")}</button></div>`});h+=`</div>`});
+if(!P.length)h+=`<p class="mt">…</p>`;$("#m").innerHTML=h+`</div><p class="mt" style="text-align:center">v2</p>`;
+document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
+document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{const[id,i]=b.dataset.a.split("|");const x=cart.find(c=>c.id==id&&c.i==i);x?x.q++:cart.push({id,i:+i,q:1});render()})}
+const IT=()=>P.length?P:SEEDP;const find=id=>IT().find(p=>p.id==id);
+const ctot=()=>cart.reduce((a,c)=>{const p=find(c.id);return a+(p?pri(p,c.i)*c.q:0)},0);
+function openCart(done){dmode=done?"done":"cart";const pn=$("#pan");$("#dr").classList.add("o");
+if(done){pn.innerHTML=`<h2>${t("thx")}</h2><p class="mt">${t("num")}</p><div class="big">#${done.num}</div>${doneSum(done)}<button class="btn" id="x">${t("close")}</button>`;$("#x").onclick=()=>$("#dr").classList.remove("o");return}
+cart=cart.filter(c=>find(c.id));
+let h=`<h2>${editing?t("upd")+" #"+editing.num:t("cart")}</h2>${editing?`<button class="btn s" id="ce">${t("stop")}</button>`:""}`;if(!cart.length)h+=`<p>${t("empty")}</p>`;
+cart.forEach((c,k)=>{const p=find(c.id);h+=`<div class="row" style="margin-bottom:6px"><span style="flex:1">${esc(tr(p.n))} <span class="mt">${lab(p,c.i)}</span><br><b>${fmt(pri(p,c.i)*c.q)}</b></span><button class="btn s" data-q="${k}|-1">−</button><b>${c.q}</b><button class="btn s" data-q="${k}|1">+</button><button class="btn bad" data-q="${k}|0">✕</button></div>`});
+if(cart.length)h+=`<h3>${t("total")}: ${fmt(ctot())}</h3><label>${t("name")} *</label><input id="fn" value="${esc(pre.name||"")}"><label>${t("bld")} *</label><input id="fb" value="${esc(pre.bld||"")}"><label>${t("room")} *</label><input id="fr" value="${esc(pre.room||"")}"><label>${t("note")}</label><textarea id="fo" rows="3">${esc(pre.note||"")}</textarea><button class="btn" id="go" style="width:100%">${editing?t("upd"):t("send")}</button><p id="er" style="color:var(--bad)"></p>`;
+pn.innerHTML=h;
+pn.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.q.split("|");if(d==0)cart.splice(k,1);else{cart[k].q+=+d;if(cart[k].q<1)cart.splice(k,1)}render();openCart()});
+if(cart.length)$("#go").onclick=submit;const ce=$("#ce");if(ce)ce.onclick=()=>{editing=null;pre={};cart=[];render();openCart()}}
+const doneSum=d=>`<div class="card"><b>${esc(d.name)}</b><div>${t("bldf")}: ${esc(d.bld)} · ${t("roomf")}: ${esc(d.room)}</div>${d.lines.map(esc).join("<br>")}<b>${t("total")}: ${fmt(d.tot)}</b>${d.note?`<div class="note">📝 ${esc(d.note)}</div>`:""}</div>`;
+async function submit(){const v=i=>$(i).value.trim(),n=v("#fn"),b=v("#fb"),r=v("#fr"),nt=v("#fo");if(!n||!b||!r){$("#er").textContent=t("need");return}
+$("#go").disabled=true;try{const lines=cart.map(c=>{const p=find(c.id);return c.q+"× "+tr(p.n)+" "+lab(p,c.i)+" — "+fmt(pri(p,c.i)*c.q)}),tot=ctot();
+const pl={name:n,bld:b,room:r,note:nt,items:cart.map(c=>({id:c.id,i:c.i,q:c.q}))};let o;if(editing){await api("PUT","/api/order/"+editing.num,{...pl,token:editing.token});o={num:editing.num};editing=null;pre={}}else{o=await api("POST","/api/order",pl);LS.set([...LS.get(),{num:o.num,token:o.token}]);try{if("Notification"in window&&Notification.permission=="default")Notification.requestPermission()}catch(e){}}
+cart=[];render();openCart({num:o.num,name:n,bld:b,room:r,note:nt,lines,tot});track()}catch(e){$("#er").textContent=e.message=="locked"?t("locked"):"Error, please retry";$("#go").disabled=false}}
+const STS=["new","preparing","ready","delivered","rejected","cancelled"];
+function admin(){let h=`<div class="tabs">${["orders","prods","site"].map(v=>`<button class="btn ${view==v?"on":"s"}" data-v="${v}">${t(v)}</button>`).join("")}</div>`;
+if(view=="orders")h+=ordersV();else if(view=="prods")h+=prodsV();else h+=siteV();
+$("#m").innerHTML=h;document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
+if(view=="orders")bindO();else if(view=="prods")bindP();else bindS()}
+function ordersV(){const c=s=>O.filter(o=>o.st==s).length,pop={};O.forEach(o=>o.items.forEach(i=>{const k=tr(i.n);pop[k]=(pop[k]||0)+i.q}));
+const top=Object.entries(pop).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>`${esc(x[0])} ×${x[1]}`).join(" · ");
+const f=ofil,L=O.filter(o=>(!f.q||String(o.num).includes(f.q)||o.name.toLowerCase().includes(f.q.toLowerCase()))&&(f.st=="all"||o.st==f.st)&&(!f.b||o.bld.toLowerCase().includes(f.b.toLowerCase()))&&(!f.r||o.room.toLowerCase().includes(f.r.toLowerCase()))&&(!f.d||new Date(o.ts).toLocaleDateString("en-CA")==f.d));
+let h=`<div class="stat"><div><b>${O.length}</b>${t("tot")}</div>${["new","preparing","delivered","cancelled"].map(s=>`<div><b>${c(s)}</b>${t(s)}</div>`).join("")}<div><b>${fmt(O.filter(o=>!["rejected","cancelled"].includes(o.st)).reduce((a,o)=>a+o.total,0))}</b>${t("val")}</div></div><p class="mt">${t("pop")}: ${top||"—"}</p>
+<div class="row"><input id="fq" placeholder="${t("search")}" value="${esc(f.q)}" style="flex:2"><select id="fs" style="flex:1"><option value="all">${t("all")}</option>${STS.map(s=>`<option value="${s}" ${f.st==s?"selected":""}>${t(s)}</option>`).join("")}</select><input id="fb2" placeholder="${t("bldf")}" value="${esc(f.b)}" style="flex:1"><input id="fr2" placeholder="${t("roomf")}" value="${esc(f.r)}" style="flex:1"><input id="fd" type="date" value="${f.d}" style="flex:1"></div><div class="row" style="margin:8px 0"><button class="btn s" id="clr">🗑 ${t("clr")}</button></div><div class="wrap"><table>`;
+L.forEach(o=>{h+=`<tr><td><b>#${o.num}</b><br><span class="badge ${o.st=="new"?"new":""}">${t(o.st)}</span>${o.edited?" ✏️":""}<br><span class="mt">${new Date(o.ts).toLocaleString()}</span></td><td><b>${esc(o.name)}</b><br>${t("bldf")}: ${esc(o.bld)} · ${t("roomf")}: ${esc(o.room)}<br>${o.items.map(i=>`${i.q}× ${esc(tr(i.n))} ${i.l?"("+t(i.l)+")":""} — ${fmt(i.p)}`).join("<br>")}<br><b>${t("total")}: ${fmt(o.total)}</b>${o.note?`<div class="note">📝 ${esc(o.note)}</div>`:""}</td><td class="row">${o.st=="new"?`<button class="btn ok" data-o="${o.num}|preparing">${t("acc")}</button><button class="btn bad" data-o="${o.num}|rejected">${t("rejected")}</button>`:""}${["preparing","ready","delivered","cancelled"].filter(s=>s!=o.st).map(s=>`<button class="btn s" data-o="${o.num}|${s}">${t(s)}</button>`).join("")}<button class="btn bad" data-del="${o.num}">🗑 ${t("del")}</button></td></tr>`});
+return h+"</table></div>"}
+function bindO(){document.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(!confirm(t("conf2")))return;try{await api("DELETE","/api/orders/"+b.dataset.del);O=O.filter(o=>o.num!=b.dataset.del);render()}catch(e){toast("✗")}});
+$("#clr").onclick=async()=>{if(!confirm(t("conf3")))return;try{await api("DELETE","/api/orders?done=1");O=O.filter(o=>!["delivered","rejected","cancelled"].includes(o.st));render()}catch(e){toast("✗")}};const m={fq:"q",fs:"st",fb2:"b",fr2:"r",fd:"d"};Object.entries(m).forEach(([i,k])=>$("#"+i).onchange=e=>{ofil[k]=e.target.value;render()});
+document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const[n,s]=b.dataset.o.split("|");db.collection("orders").doc(n).update({st:s})})}
+function prodsV(){let h=`<div class="row"><button class="btn" id="np">+ ${t("addp")}</button>${P.length?"":`<button class="btn s" id="sd">${t("seed")}</button>`}</div><div id="ed"></div><div class="wrap"><table>`;
+P.forEach(p=>h+=`<tr><td><button class="btn s" data-e="${p.id}">${p.img?`<img src="${esc(p.img)}" width="40" alt="">`:"📷"}</button></td><td>${esc(tr(p.n))}<br><span class="mt">${esc(cn(p.c))}</span></td><td>${p.pr.map(fmt).join(" / ")}</td><td>${p.on?"✓":"✗"}</td><td><button class="btn s" data-e="${p.id}">✎</button></td></tr>`);
+return h+"</table></div>"}
+function bindP(){$("#np").onclick=()=>edit({id:"p"+Date.now(),n:{},d:{},pr:[0],c:"d",on:true});const sd=$("#sd");if(sd)sd.onclick=()=>seedAll();
+document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>edit(find(b.dataset.e)))}
+function edit(p){const e=$("#ed");e.innerHTML=`<div class="card" style="margin:10px 0">${["en","ar","he"].map(l=>`<label>${t(l)}</label><input id="n_${l}" value="${esc(p.n[l]||"")}"><textarea id="d_${l}" rows="2" placeholder="${t("desc")}">${esc(p.d[l]||"")}</textarea>`).join("")}
+<label>${t("price")}</label><input id="pr" value="${p.pr.join("/")}"><label>${t("cat")}</label><select id="c">${Object.keys(CAT).map(c=>`<option value="${c}" ${p.c==c?"selected":""}>${esc(cn(c))}</option>`).join("")}</select>
+<label><input type="checkbox" id="on" ${p.on?"checked":""} style="width:auto"> ${t("avail")}</label><label>${t("img")}</label><div class="row"><img id="pv" src="${esc(p.img||"")}" style="max-width:140px;max-height:100px;${p.img?"":"display:none"}"><label class="btn" style="cursor:pointer">📷 ${t("pick")}<input type="file" id="im" accept="image/*" style="display:none"></label><span id="up" class="mt"></span></div><div class="row"><button class="btn" id="sv">${t("save")}</button><button class="btn bad" id="dl">${t("del")}</button>${p.img?`<button class="btn s" id="ri">${t("del")} ${t("img")}</button>`:""}</div></div>`;e.scrollIntoView();
+const w=async img=>{const n={},d={};["en","ar","he"].forEach(l=>{n[l]=$("#n_"+l).value;d[l]=$("#d_"+l).value});
+await db.collection("products").doc(p.id).set({n,d,pr:$("#pr").value.split("/").map(Number).filter(x=>!isNaN(x)),lb:p.lb||"",c:$("#c").value,on:$("#on").checked,img,o:p.o??Date.now()});e.innerHTML=""};
+let cur=p.img||"";$("#im").onchange=async e=>{const f=e.target.files[0];if(!f)return;$("#up").textContent="⏳";try{cur=(await api("POST","/api/upload",await shrink(f),"image/jpeg")).url;$("#pv").src=cur;$("#pv").style.display="";$("#up").textContent="✓ "+t("save")}catch(x){$("#up").textContent="✗ "+x.message}};$("#sv").onclick=()=>w(cur);
+$("#dl").onclick=async()=>{await db.collection("products").doc(p.id).delete();e.innerHTML=""};const ri=$("#ri");if(ri)ri.onclick=()=>w("")}
+function siteV(){const F=(k,l)=>`<label>${t(k)} (${l})</label><input data-s="${k}.${l}" value="${esc((S[k]||{})[l]||"")}">`;
+return `<div class="card"><label>Logo</label><img id="lgp" src="${esc(S.logo||"/logo.png")}" style="max-width:140px;display:block"><label class="btn" style="cursor:pointer">📷 ${t("pick")}<input type="file" id="lgf" accept="image/*" style="display:none"></label><input type="hidden" data-s="logo" id="lgv" value="${esc(S.logo||"")}">${["tt","tag","ann"].map((k,i)=>["en","ar","he"].map(l=>F(["title","tag","ann"][i],l).replace(/<label>[^<]*/,`<label>${t(k)} (${l})`)).join("")).join("")}<label>${t("contact")}</label><input data-s="contact" value="${esc(S.contact||"")}"><h3>${t("cat")}</h3>${Object.keys(CAT).map(c=>["en","ar","he"].map(l=>`<label>${CAT[c][0]} (${l})</label><input data-s="cats.${c}.${l}" value="${esc((((S.cats||{})[c])||{})[l]||"")}" placeholder="${CAT[c][LI[l]]}">`).join("")).join("")}<button class="btn" id="ss">${t("save")}</button></div><div class="card" style="margin-top:10px"><h3>${PW[lang][0]}</h3><input id="pw0" type="password" placeholder="${PW[lang][1]}"><input id="pw1" type="password" placeholder="${PW[lang][2]}"><button class="btn" id="cp">${PW[lang][0]}</button></div>`}
+function bindS(){$("#lgf").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const u=(await api("POST","/api/upload",await shrink(f),"image/jpeg")).url;$("#lgv").value=u;$("#lgp").src=u}catch(x){toast("✗ "+x.message)}};$("#cp").onclick=async()=>{try{await api("POST","/api/password",{old:$("#pw0").value,new:$("#pw1").value});location.reload()}catch(e){toast("✗ "+e.message)}};$("#ss").onclick=async()=>{const o={};document.querySelectorAll("[data-s]").forEach(i=>{const k=i.dataset.s.split(".");let c=o;k.slice(0,-1).forEach(x=>c=c[x]=c[x]||{});c[k.at(-1)]=i.value});await db.collection("site").doc("main").set(o);toast("✓")}}
+const LO={en:"Logout",ar:"تسجيل الخروج",he:"יציאה"},PW={en:["Change password","Current password","New password (min 6)"],ar:["تغيير كلمة المرور","كلمة المرور الحالية","كلمة المرور الجديدة (6 على الأقل)"],he:["שינוי סיסמה","סיסמה נוכחית","סיסמה חדשה (לפחות 6)"]};
+const api=async(m,u,b,raw)=>{const r=await fetch(u,{method:m,credentials:"same-origin",headers:raw?{"Content-Type":raw}:b?{"Content-Type":"application/json"}:{},body:raw?b:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.e||r.status);return j};
+function poll(url,ms,cb){let last="";const tick=async()=>{try{const j=await api("GET",url),k=JSON.stringify(j);if(k!=last){last=k;cb(j)}}catch(e){}};tick();setInterval(tick,ms)}
+const mk=col=>({doc:id=>({set:d=>api("PUT",`/api/${col}/${id}`,d),update:d=>api("PATCH",`/api/${col}/${id}`,d),delete:()=>api("DELETE",`/api/${col}/${id}`),onSnapshot:cb=>poll(`/api/${col}/${id}`,8000,j=>cb({data:()=>j}))}),
+onSnapshot(cb){let seen=null;poll("/api/"+col,col=="orders"?3000:8000,L=>{const ch=seen?L.filter(x=>!seen.has(x.id)).map(x=>({type:"added",doc:{data:()=>x}})):[];seen=new Set(L.map(x=>x.id));cb({docs:L.map(x=>({id:x.id,data:()=>x})),docChanges:()=>ch})})}});
+function loginUI(){const T={en:["Admin login","Password","Login","Wrong password"],ar:["دخول الإدارة","كلمة المرور","دخول","كلمة المرور خاطئة"],he:["כניסת מנהל","סיסמה","כניסה","סיסמה שגויה"]}[lang];$("#cb").style.display="none";$("#adm").style.display="none";
+$("#m").innerHTML=`<div class="card" style="max-width:340px;margin:40px auto"><h2>${T[0]}</h2><input id="pw" type="password" placeholder="${T[1]}" autocomplete="current-password"><button class="btn" id="lg">${T[2]}</button><p id="er" style="color:var(--bad)"></p></div>`;
+const go=async()=>{try{await api("POST","/api/login",{password:$("#pw").value});location.reload()}catch(e){$("#er").textContent=e.message=="wrong password"?T[3]:e.message}};$("#lg").onclick=go;$("#pw").onkeydown=e=>{if(e.key=="Enter")go()}}
+const shrink=f=>new Promise((ok,no)=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1200/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(b=>b?ok(b):no(new Error("img")),"image/jpeg",.85)};im.onerror=()=>no(new Error("format"));im.src=URL.createObjectURL(f)});
+Object.assign(U.en,{myo:"My orders",edit:"Edit",cancel:"Cancel order",upd:"Update order",stop:"Stop editing",none:"No orders yet",locked:"This order is already being prepared and can’t be changed",pick:"Choose image",rdy:"Your order is ready!",accd:"Your order is being prepared",conf:"Cancel this order?"});
+Object.assign(U.ar,{myo:"طلباتي",edit:"تعديل",cancel:"إلغاء الطلب",upd:"تحديث الطلب",stop:"إيقاف التعديل",none:"لا توجد طلبات بعد",locked:"الطلب قيد التحضير ولا يمكن تعديله",pick:"اختيار صورة",rdy:"طلبك جاهز!",accd:"طلبك قيد التحضير",conf:"إلغاء هذا الطلب؟"});
+Object.assign(U.he,{myo:"ההזמנות שלי",edit:"עריכה",cancel:"ביטול הזמנה",upd:"עדכון הזמנה",stop:"הפסק עריכה",none:"אין הזמנות עדיין",locked:"ההזמנה כבר בהכנה ולא ניתן לשנות",pick:"בחר תמונה",rdy:"ההזמנה שלך מוכנה!",accd:"ההזמנה שלך בהכנה",conf:"לבטל הזמנה זו?"});
+Object.assign(U.en,{clr:"Delete all finished orders",conf2:"Delete this order permanently?",conf3:"Delete all delivered, rejected and cancelled orders permanently?"});
+Object.assign(U.ar,{clr:"حذف كل الطلبات المنتهية",conf2:"حذف هذا الطلب نهائياً؟",conf3:"حذف كل الطلبات المسلّمة والمرفوضة والملغاة نهائياً؟"});
+Object.assign(U.he,{clr:"מחק את כל ההזמנות שהסתיימו",conf2:"למחוק הזמנה זו לצמיתות?",conf3:"למחוק לצמיתות את כל ההזמנות שנמסרו, נדחו ובוטלו?"});
+const LS={get(){try{return JSON.parse(localStorage.getItem("ho")||"[]")}catch(e){return[]}},set(v){try{localStorage.setItem("ho",JSON.stringify(v.slice(-30)))}catch(e){}}};
+let editing=null,pre={},dmode="",MY=[],prevSt={};
+function notify(o){const m=(o.st=="ready"?t("rdy"):o.st=="preparing"?t("accd"):t(o.st))+" #"+o.num;toast("🔔 "+m,o.st=="ready"?15000:6000);try{if("Notification"in window&&Notification.permission=="granted")new Notification("Hisham Coffee",{body:m});navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
+async function track(){const sv=LS.get();if(!sv.length)return;try{MY=(await api("POST","/api/track",sv)).sort((a,b)=>b.ts-a.ts);MY.forEach(o=>{if(prevSt[o.num]?prevSt[o.num]!=o.st:o.st=="ready")notify(o);prevSt[o.num]=o.st});const mb=$("#mb");mb.textContent="📋 "+t("myo")+" ("+MY.length+")";if(dmode=="my"&&$("#dr").classList.contains("o"))myOrders()}catch(e){}}
+function myOrders(){dmode="my";$("#dr").classList.add("o");let h=`<h2>${t("myo")}</h2>`;if(!MY.length)h+=`<p class="mt">${t("none")}</p>`;
+MY.forEach(o=>{h+=`<div class="card" style="margin-bottom:8px"><div class="row"><b style="flex:1;font-size:1.3rem">#${o.num}</b><span class="badge ${o.st=="ready"?"new":""}">${t(o.st)}</span></div>${doneSum({name:o.name,bld:o.bld,room:o.room,note:o.note,tot:o.total,lines:o.items.map(i=>i.q+"× "+tr(i.n)+" "+(i.l?t(i.l):"")+" — "+fmt(i.p*i.q))})}${o.st=="new"?`<div class="row"><button class="btn" data-ed="${o.num}">✎ ${t("edit")}</button><button class="btn bad" data-cn="${o.num}">${t("cancel")}</button></div>`:""}</div>`});
+$("#pan").innerHTML=h+`<button class="btn s" id="x">${t("close")}</button>`;$("#x").onclick=()=>$("#dr").classList.remove("o");
+$("#pan").querySelectorAll("[data-cn]").forEach(b=>b.onclick=async()=>{if(!confirm(t("conf")))return;const k=LS.get().find(x=>x.num==b.dataset.cn);try{await api("PATCH","/api/order/"+k.num,{token:k.token})}catch(e){toast(t("locked"))}track()});
+$("#pan").querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{const o=MY.find(x=>x.num==b.dataset.ed),k=LS.get().find(x=>x.num==o.num);cart=o.items.filter(i=>i.id&&find(i.id)).map(i=>({id:i.id,i:i.i,q:i.q}));editing={num:o.num,token:k.token};pre={name:o.name,bld:o.bld,room:o.room,note:o.note};render();openCart()})}
+$("#mb").onclick=myOrders;
+(async()=>{db=null;try{cart=JSON.parse(localStorage.getItem("hc")||"[]")}catch(e){}setLang(lang);
+if(window.IS_ADMIN_PAGE){try{await api("GET","/api/me");isAdm=true;view="orders"}catch(e){return loginUI()}}
+db={collection:mk};
+db.collection("products").onSnapshot(s=>{P=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.o||0)-(b.o||0));if(!(view=="prods"&&$("#ed")&&$("#ed").innerHTML))render()});
+db.collection("site").doc("main").onSnapshot(s=>{S=s.data()||{};render()});
+if(isAdm)db.collection("orders").onSnapshot(s=>{O=s.docs.map(d=>d.data()).sort((a,b)=>b.ts-a.ts);if(!first)s.docChanges().forEach(c=>{if(c.type=="added")toast("🔔 "+t("new1")+" #"+c.doc.data().num)});first=false;if(view=="orders"&&!document.activeElement.matches("input,select"))render()});
+render();if(!window.IS_ADMIN_PAGE){track();setInterval(track,5000)}})();
+</script></body></html>
